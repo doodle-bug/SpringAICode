@@ -7,7 +7,10 @@ import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.embedding.EmbeddingModel;
+//import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,9 +21,13 @@ public class AIController {
 
     private ChatClient chatClient;
 
-    public AIController(OpenAiChatModel chatModel){
-        this.chatClient = ChatClient.create(chatModel);
-    }
+    @Autowired
+//    @Qualifier("openAiEmbeddingModel")
+    private EmbeddingModel embeddingModel;
+
+//    public AIController(OpenAiChatModel chatModel){
+//        this.chatClient = ChatClient.create(chatModel);
+//    }
 
     // Only use when dealing with only one model
 //    public AIController(ChatClient.Builder builder){
@@ -31,13 +38,14 @@ public class AIController {
             .builder()
             .build();
 
-//    public AIController(ChatClient.Builder builder){
-//        this.chatClient = builder
-//                .defaultAdvisors(MessageChatMemoryAdvisor
-//                        .builder(chatMemory)
-//                        .build())
-//                .build();
-//    }
+    public AIController(ChatClient.Builder builder, EmbeddingModel embeddingModel){
+        this.chatClient = builder
+                .defaultAdvisors(MessageChatMemoryAdvisor
+                        .builder(chatMemory)
+                        .build())
+                .build();
+        this.embeddingModel = embeddingModel;
+    }
 
     @GetMapping("/api/{message}")
     public ResponseEntity<String> getAnswer(@PathVariable String message){
@@ -80,8 +88,14 @@ public class AIController {
 
         String response = chatClient
                 .prompt(prompt)
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, "amit-default-session"))
                 .call()
                 .content();
         return response;
+    }
+
+    @PostMapping("/api/embedding")
+    public float[] embeddings(@RequestParam String text){
+        return embeddingModel.embed(text);
     }
 }

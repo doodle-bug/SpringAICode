@@ -5,7 +5,7 @@ import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.ollama.OllamaChatModel;
+//import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,9 +16,9 @@ public class OllamaController {
 
     private ChatClient chatClient;
 
-    public OllamaController(OllamaChatModel chatModel){
-        this.chatClient = ChatClient.create(chatModel);
-    }
+//    public OllamaController(OllamaChatModel chatModel){
+//        this.chatClient = ChatClient.create(chatModel);
+//    }
 
     // Only use when dealing with only one model
 //    public AIController(ChatClient.Builder builder){
