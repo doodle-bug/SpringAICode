@@ -9,11 +9,15 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.embedding.EmbeddingModel;
 //import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.embedding.EmbeddingRequest;
+import org.springframework.ai.embedding.EmbeddingResponse;
+import org.springframework.ai.google.genai.text.GoogleGenAiTextEmbeddingOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -96,6 +100,42 @@ public class AIController {
 
     @PostMapping("/api/embedding")
     public float[] embeddings(@RequestParam String text){
-        return embeddingModel.embed(text);
+//        return embeddingModel.embed(text);
+        EmbeddingRequest request = new EmbeddingRequest(
+                List.of(text),
+                GoogleGenAiTextEmbeddingOptions.builder()
+                        .dimensions(2)
+                        .build()
+        );
+
+        EmbeddingResponse response = embeddingModel.call(request);
+
+        return response.getResult().getOutput();
     }
+
+    @PostMapping("/api/similarity")
+    public double getSimilarity(@RequestParam String text1, @RequestParam String text2){
+        float[] embedding1 = embeddingModel.embed(text1);
+        float[] embedding2 = embeddingModel.embed(text2);
+
+        double dotProduct = 0;
+        double norm1 = 0;
+        double norm2 = 0;
+
+        for(int i=0; i<embedding1.length; i++){
+            dotProduct += embedding1[i] * embedding2[i];
+            norm1 += Math.pow(embedding1[i], 2);
+            norm2 += Math.pow(embedding2[i], 2 );
+        }
+
+        return dotProduct*100/(Math.sqrt(norm1) * Math.sqrt(norm2));
+    }
+
+    @PostMapping("/api/product")
+    public String getProducts(@RequestParam String text){
+
+
+        return "";
+    }
+
 }
