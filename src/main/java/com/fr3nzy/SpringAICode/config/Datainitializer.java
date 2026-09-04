@@ -1,4 +1,4 @@
-package com.fr3nzy.SpringAICode;
+package com.fr3nzy.SpringAICode.config;
 
 
 import jakarta.annotation.PostConstruct;
