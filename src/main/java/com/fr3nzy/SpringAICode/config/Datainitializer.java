@@ -18,7 +18,7 @@ public class Datainitializer {
     @Autowired
     private VectorStore vectorStore;
 
-    @PostConstruct
+//    @PostConstruct
     public void initData(){
         TextReader textReader = new TextReader(new ClassPathResource("product_details.txt"));
         TokenTextSplitter splitter = TokenTextSplitter.builder()
