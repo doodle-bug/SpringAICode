@@ -197,35 +197,5 @@ public class AIController {
 //        return response.getResult().getOutput().getUrl();
 //    }
 
-    @GetMapping("/api/imagegen")
-    public String genImage(@RequestParam(name = "query") String query) {
-        ImagePrompt prompt = new ImagePrompt(query, ImageOptionsBuilder.builder()
-                .height(1024)
-                .width(1024)
-                .style("natural")
-                .build());
-        ImageResponse response = imageModel.call(prompt);
 
-        return response.getResult().getOutput().getUrl();
-    }
-
-    @PostMapping("/api/imagedes")
-    public String descimage(@RequestParam String query, @RequestParam MultipartFile file) {
-        // 1. Resolve MIME type from file or fallback
-        MimeType mimeType = MediaTypeFactory.getMediaType(file.getOriginalFilename())
-                .map(mediaType -> (MimeType) mediaType)
-                .orElseGet(() -> {
-                    String ct = file.getContentType();
-                    return (ct != null && !ct.equals(MediaType.APPLICATION_OCTET_STREAM_VALUE))
-                            ? MimeTypeUtils.parseMimeType(ct)
-                            : MimeTypeUtils.IMAGE_JPEG;
-                });
-
-        // 2. Pass to Gemini WITHOUT the chat memory advisor
-        return chatClient.prompt()
-                .user(u -> u.text(query)
-                        .media(new Media(mimeType, file.getResource())))
-                .call()
-                .content();
-    }
 }
